@@ -1,5 +1,5 @@
 # How to build and run jvncdo  
-Nothing special. Run setup-jython.py with clean and bdist_egg command by Jython, set JYTHONPATH tp built egg file and then run "import jvncdotool;jvncdotool.command.vncdo()" somehow.
+Nothing special. Run setup-jython.py with **clean** and **bdist_egg** command by Jython, set JYTHONPATH to built egg file and then run "import jvncdotool;jvncdotool.command.vncdo()" somehow.
 
 ## On Windows  
 

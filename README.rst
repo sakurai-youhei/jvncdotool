@@ -1,3 +1,7 @@
+jvncdotool
+------------
+If you want to run vncdotool by Jython which means able to run on Pure Java VM, please see README-jvncdotool.md.
+
 vncdotool
 ------------
 
