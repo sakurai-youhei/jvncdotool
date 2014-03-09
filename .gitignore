@@ -1,8 +1,10 @@
 *.pyc
+*.class
 build
 dist
 MANIFEST
 vncdotool.egg-info
+jvncdotool.egg-info
 .coverage
 .noseids
 .tox
