@@ -1,0 +1,12 @@
+[submodule "externals/pymaging"]
+	path = externals/pymaging
+	url = https://github.com/ojii/pymaging.git
+[submodule "externals/pymaging-png"]
+	path = externals/pymaging-png
+	url = https://github.com/ojii/pymaging-png.git
+[submodule "externals/zope.interface"]
+	path = externals/zope.interface
+	url = https://github.com/zopefoundation/zope.interface.git
+[submodule "externals/twisted"]
+	path = externals/twisted
+	url = https://github.com/twisted/twisted.git
