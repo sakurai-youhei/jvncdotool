@@ -1,6 +1,8 @@
 jvncdotool
 ------------
-If you want to run vncdotool by Jython which means able to run on Pure Java VM, please see README-jvncdotool.md.
+If you want to run vncdotool by Jython which means able to run it on Pure Java VM, please see README-jvncdotool.md for further info.
+
+Regarding other parts such as original code of vncdotool, documentation, etc, please follow below and original author (Mr. Marc Sibson) who did amazing work to enable me to play VNC by Java. ;)
 
 vncdotool
 ------------
