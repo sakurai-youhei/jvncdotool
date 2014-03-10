@@ -10,3 +10,9 @@
 [submodule "externals/twisted"]
 	path = externals/twisted
 	url = https://github.com/twisted/twisted.git
+[submodule "externals/pymaging-jpg"]
+	path = externals/pymaging-jpg
+	url = https://github.com/ojii/pymaging-jpg.git
+[submodule "externals/pymaging-bmp"]
+	path = externals/pymaging-bmp
+	url = https://github.com/ojii/pymaging-bmp.git

@@ -8,3 +8,4 @@ jvncdotool.egg-info
 .coverage
 .noseids
 .tox
+jython-standalone-2.7-b1.jar

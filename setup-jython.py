@@ -16,7 +16,7 @@ if not sys.executable:
         if len(jython_jar_and_None)!=1:
             jython_jar_and_None.remove(None)
             jython_jar = jython_jar_and_None.pop().group()
-            sys.executable = p.split(jython_jar)+jython_jar
+            sys.executable = p.split(jython_jar)[0]+jython_jar
 
 setuptools_dir=os.path.join(os.path.dirname(__file__), "externals", "setuptools-3.0.2")
 sys.path.append(setuptools_dir)
@@ -25,7 +25,9 @@ from setuptools import setup
 dependencies = [
     "vncdotool",
     "pymaging",
+    "pymaging_bmp",
     "pymaging_png",
+    "pymaging_jpg",
     "twisted",
     "zope",
 ]
@@ -34,7 +36,9 @@ package_dir={
     "vncdotool": os.path.join(os.path.dirname(__file__), "vncdotool"),
     "jvncdotool": os.path.join(os.path.dirname(__file__), "jvncdotool"),
     "pymaging": os.path.join(os.path.dirname(__file__), "externals", "pymaging", "pymaging"),
+    "pymaging_bmp": os.path.join(os.path.dirname(__file__), "externals", "pymaging-bmp", "pymaging_bmp"),
     "pymaging_png": os.path.join(os.path.dirname(__file__), "externals", "pymaging-png", "pymaging_png"),
+    "pymaging_jpg": os.path.join(os.path.dirname(__file__), "externals", "pymaging-jpg", "pymaging_jpg"),
     "twisted": os.path.join(os.path.dirname(__file__), "externals", "twisted", "twisted"),
     "zope": os.path.join(os.path.dirname(__file__), "externals", "zope.interface", "src", "zope"),
 }
