@@ -91,15 +91,13 @@ class Image(pymaging.image.LoadedImage):
                     self.set_color(box[0]+x, box[1]+y, img.get_color(x, y))
             
     def histogram(self):
-        histo = [0,]*(255*self.pixelsize)
-        for x in xrange(self.width):
-            for y in xrange(self.height):
-                col = self.get_color(x, y)
-                histo[col.red] +=1
-                histo[256+col.green] +=1
-                histo[256+256+col.blue] +=1
-                if self.pixelsize==4:
-                    histo[256+256+256+col.alpha] +=1
+        pixelsize = self.pixelsize
+        data = self.pixels.data
+        histo = [0,]*(255*pixelsize)
+        col=0
+        for d in data:
+            histo[d+256*col] +=1
+            col = (col+1)%pixelsize
         return histo
 
     def crop(self, box):
