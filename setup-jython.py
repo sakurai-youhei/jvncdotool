@@ -62,7 +62,7 @@ for root, dirs, files in os.walk(package_dir["zope"]):
 
 setup(
     name='jvncdotool',
-    version='0.0.1.dev0',
+    version='0.0.1.dev1',
     description='Command line VNC client for Jython',
     install_requires=[],
     url='https://github.com/sakurai-youhei/vncdotool',

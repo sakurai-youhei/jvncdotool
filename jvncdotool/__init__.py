@@ -10,14 +10,17 @@ if not hasattr(__builtin__, 'buffer'):
        return object[offset:offset+size]
     __builtin__.buffer = _buffer
 
-# Rewriting one function to avoid "ImportError: No module named twisted.internet"
+# Disabling _ModuleProxy wrapping of twisted to avoid "ImportError: No module named twisted.internet"
+import sys
 import twisted.python.deprecate
-twisted.python.deprecate.deprecatedModuleAttribute=lambda *x: None
+if isinstance(sys.modules["twisted"], twisted.python.deprecate._ModuleProxy):
+    sys.modules["twisted"]=twisted.python.deprecate._InternalState(sys.modules["twisted"])._module
 
 # https://twistedmatrix.com/trac/ticket/3413#comment:21
 import platform
+import types
+
 if platform.system()=="Java":
-    import types
     import twisted.python.runtime
     del twisted.python.runtime.Platform.isWindows
     twisted.python.runtime.Platform.isWindows = types.MethodType(
@@ -25,12 +28,12 @@ if platform.system()=="Java":
         None,
         twisted.python.runtime.Platform
     )
-    del twisted.python.runtime.Platform.isLinux
-    twisted.python.runtime.Platform.isLinux = types.MethodType(
-        lambda x: __import__("java.lang.System").lang.System.getProperty('os.name').lower().startswith('linux'),
-        None,
-        twisted.python.runtime.Platform
-    )
+    #del twisted.python.runtime.Platform.isLinux
+    #twisted.python.runtime.Platform.isLinux = types.MethodType(
+    #    lambda x: __import__("java.lang.System").lang.System.getProperty('os.name').lower().startswith('linux'),
+    #    None,
+    #    twisted.python.runtime.Platform
+    #)
 
 
 # Adding unimplemented ident of threading.Thread
