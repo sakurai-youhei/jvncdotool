@@ -86,14 +86,16 @@ class Image(pymaging.image.LoadedImage):
                 box = (box[0], box[1])
             if len(box)!=2:
                 raise Error("Unexpected box was given: %s"%box)
+            pixels = self.pixels
+            img_pixels = img.pixels
             for x in xrange(img.width):
                 for y in xrange(img.height):
-                    self.set_color(box[0]+x, box[1]+y, img.get_color(x, y))
+                    pixels.set(box[0]+x, box[1]+y, img_pixels.get(x, y))
             
     def histogram(self):
         pixelsize = self.pixelsize
         data = self.pixels.data
-        histo = [0,]*(255*pixelsize)
+        histo = [0,]*(256*pixelsize)
         col=0
         for d in data:
             histo[d+256*col] +=1
