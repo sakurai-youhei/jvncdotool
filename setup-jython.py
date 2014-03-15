@@ -30,6 +30,8 @@ dependencies = [
     "pymaging_jpg",
     "twisted",
     "zope",
+    "concurrent",
+    "futures",
 ]
 package_dir={
     "": setuptools_dir,
@@ -41,6 +43,8 @@ package_dir={
     "pymaging_jpg": os.path.join(os.path.dirname(__file__), "externals", "pymaging-jpg", "pymaging_jpg"),
     "twisted": os.path.join(os.path.dirname(__file__), "externals", "twisted", "twisted"),
     "zope": os.path.join(os.path.dirname(__file__), "externals", "zope.interface", "src", "zope"),
+    "concurrent": os.path.join(os.path.dirname(__file__), "externals", "futures-2.1.6", "concurrent"),
+    "futures": os.path.join(os.path.dirname(__file__), "externals", "futures-2.1.6", "futures"),
 }
 
 for root, dirs, files in os.walk(package_dir["twisted"]):
@@ -54,6 +58,13 @@ for root, dirs, files in os.walk(package_dir["zope"]):
     #print root, files
     if "__init__.py" in files:
         package = "zope"+root.replace(package_dir["zope"], "").replace(os.sep, ".")
+        dependencies.append(package)
+        package_dir[package] = root
+
+for root, dirs, files in os.walk(package_dir["concurrent"]):
+    #print root, files
+    if "__init__.py" in files:
+        package = "concurrent"+root.replace(package_dir["concurrent"], "").replace(os.sep, ".")
         dependencies.append(package)
         package_dir[package] = root
 

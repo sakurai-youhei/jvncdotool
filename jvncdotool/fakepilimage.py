@@ -1,7 +1,9 @@
 import time
-import threading
 import array
 import logging
+
+import concurrent.futures.thread
+executer = concurrent.futures.thread.ThreadPoolExecutor(max_workers=10)
 
 #import pymaging_bmp.bmp
 import pymaging_png.png
@@ -59,16 +61,10 @@ class Image(pymaging.image.LoadedImage):
         elif decodemode.lower()=="rgbx":
             original_bytes = array.array("B", data)
             image_bytes = array.array("B", [0,]*(len(data)*3/4))
-            def func(org, dst, c):
-                for i in xrange(len(org)/4):
-                    dst[c+3*i] = org[c+4*i]
-            threads = []
-            for col in xrange(3):
-                t = threading.Thread(target=func, args=(original_bytes, image_bytes, col))
-                threads.append(t)
-                t.start()
-            for t in threads:
-                t.join()
+            def func(c):
+                for i in xrange(len(original_bytes)/4):
+                    image_bytes[c+3*i] = original_bytes[c+4*i]
+            [x for x in executer.map(func, *(xrange(3), ))]
             #image_bytes = array.array("B", "")
             #for i in xrange(len(original_bytes)):
             #    if i%4==3:
@@ -98,7 +94,17 @@ class Image(pymaging.image.LoadedImage):
                 box = (box[0], box[1])
             if len(box)!=2:
                 raise Error("Unexpected box was given: %s"%box)
-            self.blit(box[0], box[1], img)
+            imgs = []
+            ys = []
+            dev = 4
+            w = img.width
+            h = img.height
+            for i in xrange(dev):
+                ys.append((h*i/dev, h*(i+1)/dev))
+            def func(fn, y):
+                fn(0, y[0], img.crop((0, y[0], w, y[1])))
+            #self.blit(box[0], box[1], img)
+            [x for x in executer.map(func, *([self.blit,]*4, ys))]
             #pixels = self.pixels
             #img_pixels = img.pixels
             #for x in xrange(img.width):
@@ -117,21 +123,23 @@ class Image(pymaging.image.LoadedImage):
         #for col in xrange(pixelsize):
         #    for i in xrange(256):
         #        histo[i+256*col] = col_data[col].count(i)
-        def func(d, h, c, n):
+        def func(c, n):
             offset = 256*c
-            for i in xrange(c, len(d), n):
-                h[d[i]+offset] +=1
-        threads = []
-        for col in xrange(pixelsize):
-            t = threading.Thread(target=func, args=(data, histo, col, pixelsize))
-            t.start()
-            threads.append(t)
-        for t in threads:
-            t.join()
+            for i in xrange(c, len(data), n):
+                histo[data[i]+offset] +=1
+        [x for x in executer.map(func, *(xrange(pixelsize), (pixelsize,)*pixelsize))]
+        #threads = []
+        #for col in xrange(pixelsize):
+        #    t = threading.Thread(target=func, args=(data, histo, col, pixelsize))
+        #    t.start()
+        #    threads.append(t)
+        #for t in threads:
+        #    t.join()
         #col=0
         #for d in data:
         #    histo[d+256*col] +=1
         #    col = (col+1)%pixelsize
+        #print histo
         return histo
 
     def crop(self, box):
