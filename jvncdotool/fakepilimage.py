@@ -1,4 +1,7 @@
 import time
+import threading
+import array
+import logging
 
 #import pymaging_bmp.bmp
 import pymaging_png.png
@@ -9,6 +12,8 @@ pymaging.formats.register(pymaging_png.png.PNG)
 pymaging.formats.register(pymaging_jpg.jpg.JPG)
 
 import pymaging.image
+from pymaging.pixelarray import get_pixel_array
+from pymaging.colors import RGB
 
 class Image(pymaging.image.LoadedImage):
     @classmethod
@@ -41,9 +46,6 @@ class Image(pymaging.image.LoadedImage):
 
     @classmethod
     def fromstring(cls, mode, size, data, *args):
-        import array
-        from pymaging.pixelarray import get_pixel_array
-        from pymaging.colors import RGB
         decoder = args[0]
         decodemode = args[1]
         if decoder.lower()!="raw":
@@ -56,12 +58,23 @@ class Image(pymaging.image.LoadedImage):
             image_bytes = array.array("B", data)
         elif decodemode.lower()=="rgbx":
             original_bytes = array.array("B", data)
-            image_bytes = array.array("B", "")
-            for i in xrange(len(original_bytes)):
-                if i%4==3:
-                    continue
-                else:
-                    image_bytes.append(original_bytes[i])
+            image_bytes = array.array("B", [0,]*(len(data)*3/4))
+            def func(org, dst, c):
+                for i in xrange(len(org)/4):
+                    dst[c+3*i] = org[c+4*i]
+            threads = []
+            for col in xrange(3):
+                t = threading.Thread(target=func, args=(original_bytes, image_bytes, col))
+                threads.append(t)
+                t.start()
+            for t in threads:
+                t.join()
+            #image_bytes = array.array("B", "")
+            #for i in xrange(len(original_bytes)):
+            #    if i%4==3:
+            #        continue
+            #    else:
+            #        image_bytes.append(original_bytes[i])
         else:
             raise Error("Unexpected decode mode: decodemode->%s"%decodemode)
           
@@ -71,7 +84,6 @@ class Image(pymaging.image.LoadedImage):
         return img
     
     def paste(self, *args):
-        import logging
         if not issubclass(args[0].__class__, pymaging.image.Image):
             logging.warn("Do nothing because only Image update is implemented in paste().")
         else:
@@ -86,20 +98,40 @@ class Image(pymaging.image.LoadedImage):
                 box = (box[0], box[1])
             if len(box)!=2:
                 raise Error("Unexpected box was given: %s"%box)
-            pixels = self.pixels
-            img_pixels = img.pixels
-            for x in xrange(img.width):
-                for y in xrange(img.height):
-                    pixels.set(box[0]+x, box[1]+y, img_pixels.get(x, y))
+            self.blit(box[0], box[1], img)
+            #pixels = self.pixels
+            #img_pixels = img.pixels
+            #for x in xrange(img.width):
+            #    for y in xrange(img.height):
+            #        pixels.set(box[0]+x, box[1]+y, img_pixels.get(x, y))
             
     def histogram(self):
         pixelsize = self.pixelsize
         data = self.pixels.data
-        histo = [0,]*(256*pixelsize)
-        col=0
-        for d in data:
-            histo[d+256*col] +=1
-            col = (col+1)%pixelsize
+        histo = array.array("L", [0,]*256*pixelsize)
+
+        #for d in data:
+        #    histo[d] += 1
+        #histo = [0,]*(256*pixelsize)
+        #col_data = zip(*[data[x:x+pixelsize] for x in xrange(0, len(data)-1, pixelsize)])
+        #for col in xrange(pixelsize):
+        #    for i in xrange(256):
+        #        histo[i+256*col] = col_data[col].count(i)
+        def func(d, h, c, n):
+            offset = 256*c
+            for i in xrange(c, len(d), n):
+                h[d[i]+offset] +=1
+        threads = []
+        for col in xrange(pixelsize):
+            t = threading.Thread(target=func, args=(data, histo, col, pixelsize))
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
+        #col=0
+        #for d in data:
+        #    histo[d+256*col] +=1
+        #    col = (col+1)%pixelsize
         return histo
 
     def crop(self, box):
